@@ -84,12 +84,15 @@ The architecture includes:
    	)
    )
    GO
-3. Connect Source Data from On-Prem MSSQL Server to Azure Dataset
+3. To Begin the ETL process, I created a data pipeline in Azure Synapse Analytics that Moves Data from On-Premise MSSQL Server to the Synapse Dedicated SQL Pool DW Tables. Steps to achieve this are detailed below;
+   
+  - Source: Connect Source Data from On-Prem MSSQL Server to Azure Dataset
      - I created a Self-Hosted Integration Runtime to create to Connect Data from On-Premise MSQl Server
      - I proceeded to use my Integration Runtime to create a Linked Service to the Source Dataset where On-Prem Data will reside
-     - I use the below Query to get the data from Fact Table into the Source Dataset
+     - I use the below Query to load data the Fact Table in the On-Premise MSSQL into the Source Dataset considering the partition defined
        ```sql
-          SELECT ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS IncrementalID,
+       SELECT
+       ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS IncrementalID,
        GETDATE() AS [Timestamp],
        [ProductKey],
        [OrderDateKey],
@@ -111,5 +114,38 @@ The architecture includes:
        [DueDate],
        [ShipDate]
        FROM FactInternetSales
-       WHERE orderdatekey >= 20
- 
+       WHERE [OrderDateKey] >= 20101229 and [OrderDateKey] < 20240101
+     The [IncrementalID] was included to generate unique values using the ROW_NUMBER() OVER () function.
+    - Once initial data is loaded, subsequent data load is done using the query below;
+      ```sql
+      SELECT ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS IncrementalID,
+       GETDATE() AS [Timestamp],
+       [ProductKey],
+       [OrderDateKey],
+       [DueDateKey],
+       [ShipDateKey],
+       [CustomerKey],
+       [PromotionKey],
+       [CurrencyKey],
+       [SalesOrderNumber],
+       [SalesOrderLineNumber],
+       [OrderQuantity],
+       [UnitPrice],
+       [ProductStandardCost],
+       [TotalProductCost],
+       [SalesAmount],
+       [TaxAmt],
+       [Freight],
+       [OrderDate],
+       [DueDate],
+       [ShipDate]
+      FROM FactInternetSales
+      WHERE orderdate >= DATEADD(DAY, -3, CAST(GETDATE() AS DATE)) 
+ - Sink : The Sink Dataset is the destination where data loaded from the Source dataset resides. To create the sink dataset, I use the below step;
+     - I created a linked service to the Dedicated Sql Pool Table where source data would be loaded
+     - In the Copy method, I used UPSERT, this is because I want to insert new data as it comes in and update existing data when need be.
+     - The key columns I used in the copy method are [SalesOrderNumber] and [Timestamp] since they determine the transactions that comes in the destination and when they came in
+     - I also mapped the columns in the source dataset to the destination dataset to ensure there are no column mismatch when data load is in progress
+ - Trigger : I created a trigger DataLoad to initiate the pipeline every two days at 4:00 am since this is when new data comes into the Source(on-Premise SQL database.
+   
+
