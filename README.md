@@ -4,14 +4,15 @@
 
 ## Project Overview
 
-This project demonstrates a retail data pipeline built on Azure. The pipeline ingests raw sales data, processes it through ETL steps, and transforms it for analytics and reporting using Azure services such as Data Factory, Databricks, and SQL Data Warehouse.
+This project demonstrates a retail data pipeline built on Azure. The pipeline ingests raw sales data from an on-premise server, processes it through ETL steps, and transforms it for analytics and reporting using Azure services such as Data Factory, Azure Synapse Analytics, Databricks, and SQL Data Warehouse. 
 
 ## Architecture
 
-![Architecture Diagram](docs/architecture_diagram.png)
+![docs/architecture diagram](https://github.com/princeBritwum/Azure-Retail-Data-Engineering-Project/blob/main/docs/architecture%20diagram.png)
 
 The architecture includes:
-- **Azure Data Factory** for orchestrating data movement.
+- **Self-Hosted Integration runtimes** for loading data from on-prem datasource
+- **Azure Data Factory / Azure Synapse Analytics** for orchestrating data movement.
 - **Azure Databricks** for data transformation and processing.
 - **Azure Data Lake** for scalable data storage.
 - **Azure SQL Data Warehouse** for data warehousing and reporting.
@@ -24,10 +25,16 @@ The architecture includes:
 ## Getting Started
 
 ### Prerequisites
+
 - Python 3.8+
 - Azure Subscription
+  1. Synapse Workspace
+  2. Dedicated SQL Pool
+  3. Data Lake Gen 2
+  4. Databricks
 - [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli)
 - Jupyter Notebook
+- On-Premise Server with MSSQL Db
 
 ### Setup
 
@@ -35,3 +42,74 @@ The architecture includes:
    ```bash
    git clone https://github.com/your-username/azure-retail-data-engineering.git
    cd azure-retail-data-engineering
+2. Prepare Your DataWarehouse Sever on Azure Synapse Analytics using the Dedicated Sql pool. For the purposes of this demo, I used 1 fact table and two Dimension Table.
+   - In creating the Fact Table, I used a Hash Distribution , this is generally recommened against round-robbin for heavy Fact Table where data is often loaded.
+   - I created a partition on my Fact Table to group Data using the date key. 
+   ```sql
+   SET ANSI_NULLS ON
+   GO
+   SET QUOTED_IDENTIFIER ON
+   GO
+   CREATE TABLE [dbo].[FactRetail]
+   (
+   	[IncrementalKey] [int] NOT NULL,
+   	[Timestamp] [datetime2](7) NOT NULL,
+   	[ProductKey] [int] NOT NULL,
+   	[OrderDateKey] [int] NOT NULL,
+   	[DueDateKey] [int] NOT NULL,
+   	[ShipDateKey] [int] NULL,
+   	[CustomerKey] [int] NOT NULL,
+   	[PromotionKey] [int] NOT NULL,
+   	[CurrencyKey] [int] NOT NULL,
+   	[SalesOrderNumber] [nvarchar](20) NOT NULL,
+   	[SalesOrderLineNumber] [tinyint] NOT NULL,
+   	[OrderQuantity] [smallint] NOT NULL,
+   	[UnitPrice] [money] NOT NULL,
+   	[ProductStandardCost] [money] NOT NULL,
+   	[TotalProductCost] [money] NOT NULL,
+   	[SalesAmount] [money] NOT NULL,
+   	[TaxAmount] [money] NOT NULL,
+   	[FreightAmount] [money] NOT NULL,
+   	[OrderDate] [datetime] NULL,
+   	[DueDate] [datetime] NULL,
+   	[ShipDate] [datetime] NULL
+   )
+   WITH
+   (
+   	DISTRIBUTION = HASH ( [ProductKey] ),
+   	CLUSTERED COLUMNSTORE INDEX,
+   	PARTITION
+   	(
+   		[OrderDateKey] RANGE RIGHT FOR VALUES (20101229, 20110101, 20120101, 20130101, 20140101, 20150101, 20160101, 20170101, 20180101, 20190101, 20200101, 20210101, 20220101)
+   	)
+   )
+   GO
+3. Connect Source Data from On-Prem MSSQL Server to Azure Dataset
+     - I created a Self-Hosted Integration Runtime to create to Connect Data from On-Premise MSQl Server
+     - I proceeded to use my Integration Runtime to create a Linked Service to the Source Dataset where On-Prem Data will reside
+     - I use the below Query to get the data from Fact Table into the Source Dataset
+       ```sql
+          SELECT ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS IncrementalID,
+       GETDATE() AS [Timestamp],
+       [ProductKey],
+       [OrderDateKey],
+       [DueDateKey],
+       [ShipDateKey],
+       [CustomerKey],
+       [PromotionKey],
+       [CurrencyKey],
+       [SalesOrderNumber],
+       [SalesOrderLineNumber],
+       [OrderQuantity],
+       [UnitPrice],
+       [ProductStandardCost],
+       [TotalProductCost],
+       [SalesAmount],
+       [TaxAmt],
+       [Freight],
+       [OrderDate],
+       [DueDate],
+       [ShipDate]
+       FROM FactInternetSales
+       WHERE orderdatekey >= 20
+ 
