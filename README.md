@@ -209,4 +209,53 @@ Lets get into this;
     GO
 2. Next we use the  Notebook in [src/CustomerCardData.ipynb] to;
    - Load the data from the Storage Account into a Schema [CustomerCardSchema]
-   - We then imprt the sha1 function "from pyspark.sql.functions import sha1" to encrypt the CardNumber column from the data and save the transformed data back to the data lake. The Transformed data can be found in [data/Transformed/]
+   
+
+    ```ipynb
+    %%pyspark
+    from pyspark.sql.types import *
+    
+    
+    CustomerCardSchema = StructType(
+                        [ StructField("CustomerId", IntegerType(), True),
+                          StructField("CardNumber", StringType(), True),
+                          StructField("CardType", StringType(), True),
+                          StructField("IssuingCountry", StringType(), True),
+                          StructField("ExpiryDate", DateType(), True),
+                          StructField("CVV2", StringType(), True)
+                        ])
+    df = spark.read.load('abfss://files@datalakecpvl0xw.dfs.core.windows.net/sales_data/Customer Credit Card.csv', format='csv'
+    ## If header exists uncomment line below
+    , header=True, schema=CustomerCardSchema
+    )
+    df.write.mode("overwrite").saveAsTable("CustomerCardDetails")
+    display(df)
+- We then imprt the sha1 function "from pyspark.sql.functions import sha1" to encrypt the CardNumber column from the data and save the transformed data back to the data lake. The Transformed data can be found in [data/Transformed/]
+  
+  ```ipynb
+      from pyspark.sql.functions import sha1
+      from pyspark.sql.functions import *
+      
+      # compute the hash value of the name column
+      hashed_df = df.withColumn("CardHash", sha1("CardNumber"))
+      
+      hashed_df = hashed_df.select(trim('CustomerId').alias('CustomerId'), 'CardType','CardHash','IssuingCountry','ExpiryDate','CVV2')
+      display(hashed_df)
+- We then save the transformed data back to the data lake. The Transformed data can be found in [data/Transformed/]
+  ```ipynb
+      from pyspark.sql.functions import *
+      hashed_df.write.mode('overwrite').csv('/retaildata/destination/TransformedRetailData/CustomerCardData.csv')
+      print ("Transformed data saved!")
+
+- Now to load the transformed data into our DW, we make use of the 'COPY INTO' function
+  ```sql
+      COPY INTO dbo.CustomerCardData
+      (CustomerID 1, CardType 2, CardHash 3, IssuingCountry 4, ExpiryDate 5, CVV2 6)
+      FROM 'https://datalakecpvl0xw.dfs.core.windows.net/files/retaildata/destination/TransformedRetailData/CustomerCardData.csv'
+      WITH
+      (
+      	FILE_TYPE = 'CSV'
+      	,MAXERRORS = 0
+      	,FIRSTROW = 2
+      	,ERRORFILE = 'https://datalakecpvl0xw.dfs.core.windows.net/files/'
+      )
