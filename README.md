@@ -1,7 +1,5 @@
 # Azure Retail Data Engineering Project
 
-![Azure Logo](https://example.com/logo.png)
-
 ## Project Overview
 
 This project demonstrates a retail data pipeline built on Azure. The pipeline ingests raw sales data from an on-premise server, processes it through ETL steps, and transforms it for analytics and reporting using Azure services such as Data Factory, Azure Synapse Analytics, Databricks, and SQL Data Warehouse. 
