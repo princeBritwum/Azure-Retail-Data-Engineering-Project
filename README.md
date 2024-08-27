@@ -159,27 +159,52 @@ b. Sink
 c.Trigger
 ![docs/DataLoad Trigger.png](https://github.com/princeBritwum/Azure-Retail-Data-Engineering-Project/blob/main/docs/DataLoad%20Trigger.png)
 
-To see the final data in Fact Table ren the below query;
-```sql
-SELECT TOP (100) [IncrementalKey]
-,[Timestamp]
-,[ProductKey]
-,[OrderDateKey]
-,[DueDateKey]
-,[ShipDateKey]
-,[CustomerKey]
-,[PromotionKey]
-,[CurrencyKey]
-,[SalesOrderNumber]
-,[SalesOrderLineNumber]
-,[OrderQuantity]
-,[UnitPrice]
-,[ProductStandardCost]
-,[TotalProductCost]
-,[SalesAmount]
-,[TaxAmount]
-,[FreightAmount]
-,[OrderDate]
-,[DueDate]
-,[ShipDate]
- FROM [dbo].[FactRetail]
+- To see the loaded data in Fact Table from the On-Premise, run the below query;
+  ```sql
+          SELECT TOP (100) [IncrementalKey]
+          ,[Timestamp]
+          ,[ProductKey]
+          ,[OrderDateKey]
+          ,[DueDateKey]
+          ,[ShipDateKey]
+          ,[CustomerKey]
+          ,[PromotionKey]
+          ,[CurrencyKey]
+          ,[SalesOrderNumber]
+          ,[SalesOrderLineNumber]
+          ,[OrderQuantity]
+          ,[UnitPrice]
+          ,[ProductStandardCost]
+          ,[TotalProductCost]
+          ,[SalesAmount]
+          ,[TaxAmount]
+          ,[FreightAmount]
+          ,[OrderDate]
+          ,[DueDate]
+          ,[ShipDate]
+           FROM [dbo].[FactRetail]
+
+Thats not all, we also have a Customer Cards data is stored in the  Azure Datalake Storage Gen2 directory, This data is been dropped into by external data directly into the storage account, since we need this data as part of our analysis on our customers, we need to bring this data into our Datawarehouse(Dedicated SQL pool).
+The data is for Customer Cards records and contains sensitive data like Credit cards numbers we dont have everybody to have access to. 
+To achieve this goal, we will need to Transform the data as we load it from the Storage account and hash the credit cards numbers to provide security for our customers.
+
+Lets get into this;
+1. First We will need to create the Customer Cards Table in our DW. We will achieve this with the code below, remember we use the Round_robin distribution here;
+   ```sql
+   CREATE TABLE [dbo].CustomerCardData
+    (
+        [CustomerID] VARCHAR(20) NOT NULL,
+        [CardType] CHAR(50) NULL,
+        [CardHash] NVARCHAR(100) NULL,
+        [IssuingCountry] CHAR(50)  NULL,
+        [ExpiryDate] DATE NULL,
+        [CVV2] CHAR(50)  NULL
+    
+    )
+    WITH
+    (
+        DISTRIBUTION = ROUND_ROBIN,
+        CLUSTERED COLUMNSTORE INDEX
+    )
+    GO
+2. Next we use the 
