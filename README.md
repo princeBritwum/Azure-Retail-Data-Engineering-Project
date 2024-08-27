@@ -155,3 +155,6 @@ a. Source
 
 b. Sink
 ![docs/PipeLine1b.png](https://github.com/princeBritwum/Azure-Retail-Data-Engineering-Project/blob/main/docs/PipeLine1b.png)
+
+c.Trigger
+![docs/DataLoad Trigger.png](https://github.com/princeBritwum/Azure-Retail-Data-Engineering-Project/blob/main/docs/DataLoad%20Trigger.png)
