@@ -158,3 +158,28 @@ b. Sink
 
 c.Trigger
 ![docs/DataLoad Trigger.png](https://github.com/princeBritwum/Azure-Retail-Data-Engineering-Project/blob/main/docs/DataLoad%20Trigger.png)
+
+To see the final data in Fact Table ren the below query;
+```sql
+SELECT TOP (100) [IncrementalKey]
+,[Timestamp]
+,[ProductKey]
+,[OrderDateKey]
+,[DueDateKey]
+,[ShipDateKey]
+,[CustomerKey]
+,[PromotionKey]
+,[CurrencyKey]
+,[SalesOrderNumber]
+,[SalesOrderLineNumber]
+,[OrderQuantity]
+,[UnitPrice]
+,[ProductStandardCost]
+,[TotalProductCost]
+,[SalesAmount]
+,[TaxAmount]
+,[FreightAmount]
+,[OrderDate]
+,[DueDate]
+,[ShipDate]
+ FROM [dbo].[FactRetail]
