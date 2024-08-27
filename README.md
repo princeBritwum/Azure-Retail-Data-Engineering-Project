@@ -251,11 +251,12 @@ Lets get into this;
   ```sql
       COPY INTO dbo.CustomerCardData
       (CustomerID 1, CardType 2, CardHash 3, IssuingCountry 4, ExpiryDate 5, CVV2 6)
-      FROM 'https://datalakecpvl0xw.dfs.core.windows.net/files/retaildata/destination/TransformedRetailData/CustomerCardData.csv'
+      FROM 'https://datalake*******.dfs.core.windows.net/files/retaildata/destination/TransformedRetailData/CustomerCardData.csv'
       WITH
       (
       	FILE_TYPE = 'CSV'
       	,MAXERRORS = 0
       	,FIRSTROW = 2
-      	,ERRORFILE = 'https://datalakecpvl0xw.dfs.core.windows.net/files/'
+      	,ERRORFILE = 'https://datalake*******.dfs.core.windows.net/files/'
       )
+
