@@ -186,7 +186,7 @@ c.Trigger
 
 Thats not all, we also have a Customer Cards data is stored in the  Azure Datalake Storage Gen2 directory, This data is been dropped into by external data directly into the storage account, since we need this data as part of our analysis on our customers, we need to bring this data into our Datawarehouse(Dedicated SQL pool).
 The data is for Customer Cards records and contains sensitive data like Credit cards numbers we dont have everybody to have access to. 
-To achieve this goal, we will need to Transform the data as we load it from the Storage account and hash the credit cards numbers to provide security for our customers.
+To achieve this goal, we will need to Transform the data as we load it from the Storage account and encrypt the credit cards numbers to provide security for our customers.
 
 Lets get into this;
 1. First We will need to create the Customer Cards Table in our DW. We will achieve this with the code below, remember we use the Round_robin distribution here;
@@ -207,4 +207,6 @@ Lets get into this;
         CLUSTERED COLUMNSTORE INDEX
     )
     GO
-2. Next we use the 
+2. Next we use the  Notebook in [src/CustomerCardData.ipynb] to;
+   - Load the data from the Storage Account into a Schema [CustomerCardSchema]
+   - We then imprt the sha1 function "from pyspark.sql.functions import sha1" to encrypt the CardNumber column from the data and save the transformed data back to the data lake. The Transformed data can be found in [data/Transformed/]
