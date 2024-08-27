@@ -147,5 +147,11 @@ The architecture includes:
      - The key columns I used in the copy method are [SalesOrderNumber] and [Timestamp] since they determine the transactions that comes in the destination and when they came in
      - I also mapped the columns in the source dataset to the destination dataset to ensure there are no column mismatch when data load is in progress
  - Trigger : I created a trigger DataLoad to initiate the pipeline every two days at 4:00 am since this is when new data comes into the Source(on-Premise SQL database.
-   
 
+
+**Pipeline Images**
+a. Source
+![docs/PipeLine 1a.png](https://github.com/princeBritwum/Azure-Retail-Data-Engineering-Project/blob/main/docs/PipeLine%201a.png)
+
+b. Sink
+![docs/PipeLine1b.png](https://github.com/princeBritwum/Azure-Retail-Data-Engineering-Project/blob/main/docs/PipeLine1b.png)
