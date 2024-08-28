@@ -260,3 +260,63 @@ Lets get into this;
 
 -For continues integration , I added the [src/CustomerCardData.ipynb] to the Retail pipeline and added a Copy Into activity to load the transformed Customer Cards data from the Storage Location (Dalake Gen 2) into the CustomerCards table in the DW. The new pipeline is below;
 ![docs/Retail Pipeline v1.png](https://github.com/princeBritwum/Azure-Retail-Data-Engineering-Project/blob/main/docs/Retail%20Pipeline%20v1.png)
+
+At this point, we are pretty in a good shape to start visualizing data from the Data warehouse;
+
+We would use SQL to write an aggregated query for business Insights, we will then use Power BI to visualize the data. Lets dig in;
+
+- We will Create a View that would make it easy for Data Analyst and Business User to consume direct insight without worrying about SQL Queries
+  ```sql
+      CREATE VIEW CustomerTransactions
+      AS
+      SELECT P.EnglishProductName AS ProductName,
+             A.[CustomerKey],
+             M.EnglishPromotionName AS PromotionName,
+             Y.CurrencyName,
+             A.[SalesOrderNumber],
+             B.FirstName + ' ' + B.LastName As FullName,
+             CASE
+                 WHEN C.[CardType] IS NULL THEN
+                     'Cash'
+                 ELSE
+                     C.[CardType]
+             END [CardType],
+             CASE
+                 WHEN C.IssuingCountry IS NULL THEN
+                     'US'
+                 ELSE
+                     C.[IssuingCountry]
+             END [IssuingCountry],
+             SUM(A.[OrderQuantity]) AS [OrderQuantity],
+             SUM(A.[UnitPrice]) AS [UnitPrice],
+             SUM(A.[ProductStandardCost]) AS [ProductStandardCost],
+             SUM(A.[TotalProductCost]) AS [TotalProductCost],
+             SUM(A.[SalesAmount]) AS [SalesAmount],
+             SUM(A.[TaxAmount]) AS [TaxAmount],
+             SUM(A.[FreightAmount]) AS [FreightAmount],
+             CAST(A.[OrderDate] AS DATE) AS [OrderDate]
+      FROM [FactRetail] A
+          JOIN [DimCustomer] B
+              ON A.[CustomerKey] = B.CustomerKey
+          LEFT JOIN [CustomerCardData] C
+              ON A.[CustomerKey] = C.[CustomerID]
+          JOIN [dbo].[DimProduct] P
+              ON A.[ProductKey] = P.ProductKey
+          JOIN [dbo].[DimCurrency] Y
+              ON A.[CurrencyKey] = Y.[CurrencyKey]
+          JOIN DimPromotion M
+              ON A.PromotionKey = M.PromotionKey
+      WHERE YEAR(CAST(A.[OrderDate] AS DATE)) = 2013
+      GROUP BY P.EnglishDescription,
+               A.[CustomerKey],
+               A.[SalesOrderNumber],
+               CAST(A.[OrderDate] AS DATE),
+               C.[CardType],
+               C.[IssuingCountry],
+               B.FirstName,
+               B.LastName,
+               M.EnglishPromotionName,
+               P.EnglishProductName,
+               Y.CurrencyName
+
+
