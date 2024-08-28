@@ -329,4 +329,8 @@ We would use SQL to write an aggregated query for business Insights, we will the
    
 ![docs/Report Visual 1.png](https://github.com/princeBritwum/Azure-Retail-Data-Engineering-Project/blob/main/docs/Report%20Visual%201.png)
 
+### Conclusion
 
+
+
+### Challenges and Lessons Learnt
