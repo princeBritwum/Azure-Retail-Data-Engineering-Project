@@ -288,7 +288,7 @@ We would use SQL to write an aggregated query for business Insights, we will the
                      C.[IssuingCountry]
              END [IssuingCountry],
              SUM(A.[OrderQuantity]) AS [OrderQuantity],
-             SUM(A.[UnitPrice]) AS [UnitPrice],
+             AVG(A.[UnitPrice]) AS [UnitPrice],
              SUM(A.[ProductStandardCost]) AS [ProductStandardCost],
              SUM(A.[TotalProductCost]) AS [TotalProductCost],
              SUM(A.[SalesAmount]) AS [SalesAmount],
