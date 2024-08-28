@@ -258,3 +258,5 @@ Lets get into this;
       	,ERRORFILE = 'https://datalake*******.dfs.core.windows.net/files/'
       )
 
+-For continues integration , I added the [src/CustomerCardData.ipynb] to the Retail pipeline and added a Copy Into activity to load the transformed Customer Cards data from the Storage Location (Dalake Gen 2) into the CustomerCards table in the DW. The new pipeline is below;
+![docs/Retail Pipeline v1.png](https://github.com/princeBritwum/Azure-Retail-Data-Engineering-Project/blob/main/docs/Retail%20Pipeline%20v1.png)
