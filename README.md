@@ -321,6 +321,12 @@ We would use SQL to write an aggregated query for business Insights, we will the
 
 
 4. We would now use this view as our data source in Power BI to Create insightful visuals for Business Users.
-  - To create Visuals in Power BI, we need to First Establish connection with our DW(Sypase Dedicated SQL Pool) in Azure.
-      -
+ - To create Visuals in Power BI, we need to First Establish connection with our DW(Sypase Dedicated SQL Pool) in Azure.
+   
+![docs/Selecting View from DW.png](https://github.com/princeBritwum/Azure-Retail-Data-Engineering-Project/blob/main/docs/Selecting%20View%20from%20DW.png)
+
+ - We created this Report afterwards;
+   
+![docs/Report Visual 1.png](https://github.com/princeBritwum/Azure-Retail-Data-Engineering-Project/blob/main/docs/Report%20Visual%201.png)
+
 
