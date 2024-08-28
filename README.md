@@ -261,13 +261,13 @@ Lets get into this;
 -For continues integration , I added the [src/CustomerCardData.ipynb] to the Retail pipeline and added a Copy Into activity to load the transformed Customer Cards data from the Storage Location (Dalake Gen 2) into the CustomerCards table in the DW. The new pipeline is below;
 ![docs/Retail Pipeline v1.png](https://github.com/princeBritwum/Azure-Retail-Data-Engineering-Project/blob/main/docs/Retail%20Pipeline%20v1.png)
 
-At this point, we are pretty in a good shape to start visualizing data from the Data warehouse;
+3. At this point, we are pretty in a good shape to start visualizing data from the Data warehouse;
 
 We would use SQL to write an aggregated query for business Insights, we will then use Power BI to visualize the data. Lets dig in;
 
-- We will Create a View that would make it easy for Data Analyst and Business User to consume direct insight without worrying about SQL Queries
+- We will Create a View that would make it easy for Data Analyst and Business User to consume direct insight without worrying about SQL Queries, since we are using Partitions in our DW Fact Table we will select specific partition to create the view to improve the response rate of queries.
   ```sql
-      CREATE VIEW CustomerTransactions
+      CREATE VIEW CustomerTransactions2013
       AS
       SELECT P.EnglishProductName AS ProductName,
              A.[CustomerKey],
@@ -306,7 +306,7 @@ We would use SQL to write an aggregated query for business Insights, we will the
               ON A.[CurrencyKey] = Y.[CurrencyKey]
           JOIN DimPromotion M
               ON A.PromotionKey = M.PromotionKey
-      WHERE YEAR(CAST(A.[OrderDate] AS DATE)) = 2013
+      WHERE OrderDateKey >= 20130101 and OrderDateKey < 20140101
       GROUP BY P.EnglishDescription,
                A.[CustomerKey],
                A.[SalesOrderNumber],
@@ -319,4 +319,8 @@ We would use SQL to write an aggregated query for business Insights, we will the
                P.EnglishProductName,
                Y.CurrencyName
 
+
+4. We would now use this view as our data source in Power BI to Create insightful visuals for Business Users.
+  - To create Visuals in Power BI, we need to First Establish connection with our DW(Sypase Dedicated SQL Pool) in Azure.
+      -
 
