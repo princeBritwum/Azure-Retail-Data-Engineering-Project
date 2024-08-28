@@ -6,14 +6,14 @@ This project demonstrates a retail data pipeline built on Azure. The pipeline in
 
 ## Architecture
 
-![docs/architecture diagram](https://github.com/princeBritwum/Azure-Retail-Data-Engineering-Project/blob/main/docs/architecture%20diagram.png)
+![docs/Data Architecture.png](https://github.com/princeBritwum/Azure-Retail-Data-Engineering-Project/blob/main/docs/Data%20Architecture.png)
 
 The architecture includes:
 - **Self-Hosted Integration runtimes** for loading data from on-prem datasource
 - **Azure Data Factory / Azure Synapse Analytics** for orchestrating data movement.
 - **Azure Databricks** for data transformation and processing.
 - **Azure Data Lake** for scalable data storage.
-- **Azure SQL Data Warehouse** for data warehousing and reporting.
+- **Azure Dedicated SQL Pool** for data warehousing and reporting.
 
 ## Features
 - **Data Ingestion:** Automated pipelines for ingesting raw sales data.
