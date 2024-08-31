@@ -38,8 +38,8 @@ The architecture includes:
 
 1. Clone this repository:
    ```bash
-   git clone https://github.com/your-username/azure-retail-data-engineering.git
-   cd azure-retail-data-engineering
+   git clone https://github.com/princeBritwum/Azure-Retail-Data-Engineering-Project.git
+   cd Azure-Retail-Data-Engineering-Project
 2. Prepare Your DataWarehouse Sever on Azure Synapse Analytics using the Dedicated Sql pool. For the purposes of this demo, I used 1 fact table and two Dimension Table.
    - In creating the Fact Table, I used a Hash Distribution , this is generally recommened against round-robbin for heavy Fact Table where data is often loaded.
    - I created a partition on my Fact Table to group Data using the date key. 
